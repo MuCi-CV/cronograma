@@ -11,10 +11,14 @@ class ItemController extends Controller
 {
     public function update(Request $request, Item $item)
     {
+        \Log::info('item.update', ['raw' => $request->all()]);
+
         $validated = $request->validate([
             'completed' => 'required|boolean',
             'comment'   => 'nullable|string|max:1000',
         ]);
+
+        \Log::info('item.update.validated', ['completed' => $validated['completed']]);
 
         ItemUpdate::create([
             'item_id'   => $item->id,
