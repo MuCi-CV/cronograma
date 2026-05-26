@@ -79,6 +79,7 @@
                             {{-- MODO EDICIÓN --}}
                             <form method="POST" action="{{ route('items.update', $item) }}" class="flex-1 flex items-start gap-2">
                                 @csrf @method('PATCH')
+                                <input type="hidden" name="completed" value="0">
                                 <input type="checkbox" name="completed" value="1"
                                        {{ $item->isCompleted ? 'checked' : '' }}
                                        onchange="this.form.submit()"
