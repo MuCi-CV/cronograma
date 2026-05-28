@@ -48,4 +48,9 @@ class Item extends Model
             get: fn() => $this->latestUpdate?->comment,
         );
     }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ItemImage::class)->orderBy('order');
+    }
 }
