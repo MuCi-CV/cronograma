@@ -22,7 +22,7 @@
                        {{ $imageLayout === 'C' ? 'checked' : '' }}>
                 Layout C <span class="text-muci-gray">(thumbnails en card)</span>
             </label>
-            <div class="border-l border-muci-gray-light pl-6">
+            <div class="border-l border-muci-gray-light pl-6 flex items-center gap-6">
                 <label class="flex items-center gap-1.5 cursor-pointer text-xs text-muci-dark">
                     <input type="hidden" name="hide_images_mobile" value="0">
                     <input type="checkbox" name="hide_images_mobile" value="1"
@@ -30,6 +30,14 @@
                            onchange="document.getElementById('settings-form').submit()"
                            {{ $hideImagesMobile ? 'checked' : '' }}>
                     Ocultar imágenes en móvil
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-xs text-muci-dark">
+                    <input type="hidden" name="auto_refresh" value="0">
+                    <input type="checkbox" name="auto_refresh" value="1"
+                           class="accent-muci-green"
+                           onchange="document.getElementById('settings-form').submit()"
+                           {{ $autoRefresh ? 'checked' : '' }}>
+                    Auto-refresh <span class="text-muci-gray">(cada 60s)</span>
                 </label>
             </div>
         </div>

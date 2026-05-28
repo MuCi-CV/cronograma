@@ -238,14 +238,17 @@
                     $firstImg = $bImages->first();
                 @endphp
                 @if($imageLayout === 'B' && $firstImg)
-                <div class="hidden md:flex w-[calc(50%-2.5rem)] max-w-[280px] items-stretch">
-                    <img src="{{ \Storage::disk('public')->url($firstImg->path) }}"
+                @php $galleryUrls = e(json_encode($bImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())); @endphp
+                <div class="hidden md:grid grid-cols-2 gap-1 w-[calc(50%-2.5rem)] max-w-[280px] self-start">
+                    @foreach($bImages as $bIdx => $bImg)
+                    <img src="{{ \Storage::disk('public')->url($bImg->path) }}"
                          alt=""
-                         class="w-full h-full object-cover rounded-2xl cursor-pointer hover:opacity-95 transition"
-                         style="max-height: 320px;"
-                         data-gallery-images="{{ e(json_encode($bImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())) }}"
-                         data-gallery-index="0"
-                         onclick="openGallery(JSON.parse(this.dataset.galleryImages), 0)">
+                         class="w-full object-cover rounded-lg cursor-pointer hover:opacity-95 transition"
+                         style="height:160px;"
+                         data-gallery-images="{{ $galleryUrls }}"
+                         data-gallery-index="{{ $bIdx }}"
+                         onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
+                    @endforeach
                 </div>
                 @endif
             </div>
@@ -384,8 +387,8 @@ if (tlCurrent && document.getElementById('view-timeline') && !document.getElemen
     setTimeout(() => tlCurrent.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
 }
 
-// ── Auto-refresh cada 60 segundos ────────────────────────────
-setTimeout(() => location.reload(), 60000);
+// ── Auto-refresh (configurable desde settings) ───────────────
+@if($autoRefresh) setTimeout(() => location.reload(), 60000); @endif
 })();
 </script>
 @endsection

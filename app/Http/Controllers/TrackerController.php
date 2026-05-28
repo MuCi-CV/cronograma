@@ -15,8 +15,9 @@ class TrackerController extends Controller
 
         $imageLayout      = Setting::get('image_layout', 'B');
         $hideImagesMobile = Setting::get('hide_images_mobile', '0') === '1';
+        $autoRefresh      = Setting::get('auto_refresh', '0') === '1';
 
-        return view('tracker.visual', compact('stages', 'imageLayout', 'hideImagesMobile'));
+        return view('tracker.visual', compact('stages', 'imageLayout', 'hideImagesMobile', 'autoRefresh'));
     }
 
     public function detail()
@@ -27,7 +28,8 @@ class TrackerController extends Controller
 
         $imageLayout      = Setting::get('image_layout', 'B');
         $hideImagesMobile = Setting::get('hide_images_mobile', '0') === '1';
+        $autoRefresh      = Setting::get('auto_refresh', '0') === '1';
 
-        return view('tracker.detail', compact('stages', 'imageLayout', 'hideImagesMobile'));
+        return view('tracker.detail', compact('stages', 'imageLayout', 'hideImagesMobile', 'autoRefresh'));
     }
 }

@@ -12,6 +12,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'image_layout'       => 'sometimes|in:B,C',
             'hide_images_mobile' => 'sometimes|boolean',
+            'auto_refresh'       => 'sometimes|boolean',
         ]);
 
         foreach ($validated as $key => $value) {
