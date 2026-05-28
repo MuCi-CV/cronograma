@@ -49,6 +49,9 @@ class ItemImageControllerTest extends TestCase
         $image = ItemImage::where('item_id', $this->item->id)->first();
         $this->assertNotNull($image);
         Storage::disk('public')->assertExists($image->path);
+        Storage::disk('public')->assertExists($image->original_path);
+        $this->assertStringEndsWith('.jpg', $image->path);
+        $this->assertStringEndsWith('_orig.jpg', $image->original_path);
     }
 
     public function test_upload_rejects_non_image_file(): void
@@ -62,10 +65,10 @@ class ItemImageControllerTest extends TestCase
         $this->assertDatabaseCount('item_images', 0);
     }
 
-    public function test_upload_rejects_file_over_5mb(): void
+    public function test_upload_rejects_file_over_10mb(): void
     {
         Storage::fake('public');
-        $file = UploadedFile::fake()->image('big.jpg')->size(6000);
+        $file = UploadedFile::fake()->image('big.jpg')->size(11000);
 
         $this->actingAs($this->editor)
             ->post(route('images.store', $this->item), ['image' => $file]);
@@ -76,15 +79,23 @@ class ItemImageControllerTest extends TestCase
     public function test_editor_can_delete_image(): void
     {
         Storage::fake('public');
-        $path = 'items/' . $this->item->id . '/test.jpg';
+        $path         = 'items/' . $this->item->id . '/test.jpg';
+        $originalPath = 'items/' . $this->item->id . '/test_orig.jpg';
         Storage::disk('public')->put($path, 'content');
-        $image = ItemImage::create(['item_id' => $this->item->id, 'path' => $path, 'order' => 1]);
+        Storage::disk('public')->put($originalPath, 'content');
+        $image = ItemImage::create([
+            'item_id'       => $this->item->id,
+            'path'          => $path,
+            'original_path' => $originalPath,
+            'order'         => 1,
+        ]);
 
         $response = $this->actingAs($this->editor)
             ->delete(route('images.destroy', [$this->item, $image]));
 
         $response->assertRedirect();
         Storage::disk('public')->assertMissing($path);
+        Storage::disk('public')->assertMissing($originalPath);
         $this->assertDatabaseMissing('item_images', ['id' => $image->id]);
     }
 
@@ -92,7 +103,7 @@ class ItemImageControllerTest extends TestCase
     {
         Storage::fake('public');
         $otherItem = Item::skip(1)->first();
-        $path = 'items/' . $otherItem->id . '/test.jpg';
+        $path      = 'items/' . $otherItem->id . '/test.jpg';
         Storage::disk('public')->put($path, 'content');
         $image = ItemImage::create(['item_id' => $otherItem->id, 'path' => $path, 'order' => 1]);
 
@@ -106,7 +117,7 @@ class ItemImageControllerTest extends TestCase
     public function test_guest_cannot_delete_image(): void
     {
         Storage::fake('public');
-        $path = 'items/' . $this->item->id . '/test.jpg';
+        $path  = 'items/' . $this->item->id . '/test.jpg';
         Storage::disk('public')->put($path, 'content');
         $image = ItemImage::create(['item_id' => $this->item->id, 'path' => $path, 'order' => 1]);
 

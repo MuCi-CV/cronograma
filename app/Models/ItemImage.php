@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ItemImage extends Model
 {
-    protected $fillable = ['item_id', 'path', 'order'];
+    protected $fillable = ['item_id', 'path', 'original_path', 'order'];
 
     public function item(): BelongsTo
     {
