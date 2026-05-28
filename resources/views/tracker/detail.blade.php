@@ -2,6 +2,40 @@
 @section('title', 'Tracker Detallado')
 
 @section('content')
+@auth
+<div class="max-w-5xl mx-auto px-4 pt-4 pb-0">
+    <form method="POST" action="{{ route('tracker.settings.update') }}" id="settings-form">
+        @csrf @method('PATCH')
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 bg-white border border-muci-gray-light rounded-xl px-4 py-3">
+            <span class="text-[.6rem] font-bold uppercase tracking-widest text-muci-gray">Vista del timeline</span>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-muci-dark">
+                <input type="radio" name="image_layout" value="B"
+                       class="accent-muci-green"
+                       onchange="document.getElementById('settings-form').submit()"
+                       {{ $imageLayout === 'B' ? 'checked' : '' }}>
+                Layout B <span class="text-muci-gray">(imagen lateral)</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer text-xs text-muci-dark">
+                <input type="radio" name="image_layout" value="C"
+                       class="accent-muci-green"
+                       onchange="document.getElementById('settings-form').submit()"
+                       {{ $imageLayout === 'C' ? 'checked' : '' }}>
+                Layout C <span class="text-muci-gray">(thumbnails en card)</span>
+            </label>
+            <div class="border-l border-muci-gray-light pl-6">
+                <label class="flex items-center gap-1.5 cursor-pointer text-xs text-muci-dark">
+                    <input type="hidden" name="hide_images_mobile" value="0">
+                    <input type="checkbox" name="hide_images_mobile" value="1"
+                           class="accent-muci-green"
+                           onchange="document.getElementById('settings-form').submit()"
+                           {{ $hideImagesMobile ? 'checked' : '' }}>
+                    Ocultar imágenes en móvil
+                </label>
+            </div>
+        </div>
+    </form>
+</div>
+@endauth
 <div class="max-w-5xl mx-auto px-4 py-6">
 
     {{-- Tabs de etapas --}}
@@ -66,55 +100,95 @@
 
                         {{-- Items --}}
                         @foreach($section->items as $item)
-                        <div class="flex items-start gap-3 py-2.5 border-b border-muci-green-pale/50 last:border-0">
+                        <div class="py-2.5 border-b border-muci-green-pale/50 last:border-0">
+                            <div class="flex items-start gap-3">
 
-                            {{-- Badge tipo --}}
-                            <span class="mt-0.5 text-[0.55rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded
-                                {{ $item->type === 'objetivo' ? 'bg-muci-green/10 text-muci-green' : 'bg-muci-orange/10 text-muci-orange' }}">
-                                {{ $item->type }}
-                            </span>
+                                {{-- Badge tipo --}}
+                                <span class="mt-0.5 text-[0.55rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded
+                                    {{ $item->type === 'objetivo' ? 'bg-muci-green/10 text-muci-green' : 'bg-muci-orange/10 text-muci-orange' }}">
+                                    {{ $item->type }}
+                                </span>
 
-                            {{-- Modo lectura / edición --}}
+                                {{-- Modo lectura / edición --}}
+                                @auth
+                                {{-- MODO EDICIÓN --}}
+                                <form method="POST" action="{{ route('items.update', $item) }}" class="flex-1 flex items-start gap-2">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="completed" value="0">
+                                    <input type="checkbox" name="completed" value="1"
+                                           {{ $item->isCompleted ? 'checked' : '' }}
+                                           onchange="this.form.submit()"
+                                           class="mt-1 w-4 h-4 accent-muci-green cursor-pointer">
+                                    <div class="flex-1">
+                                        <span class="text-sm {{ $item->isCompleted ? 'line-through text-muci-gray' : 'text-black' }}">
+                                            {{ $item->text }}
+                                        </span>
+                                        @if($item->latestComment)
+                                        <p class="text-xs text-muci-gray mt-0.5 italic">{{ $item->latestComment }}</p>
+                                        @endif
+                                    </div>
+                                </form>
+                                @else
+                                {{-- MODO LECTURA --}}
+                                <div class="flex-1 flex items-start gap-2">
+                                    <div class="mt-1 w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0
+                                        {{ $item->isCompleted ? 'bg-muci-green border-muci-green' : 'border-muci-gray-light' }}">
+                                        @if($item->isCompleted)
+                                        <svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="text-sm {{ $item->isCompleted ? 'line-through text-muci-gray' : 'text-black' }}">
+                                            {{ $item->text }}
+                                        </span>
+                                        @if($item->latestComment)
+                                        <p class="text-xs text-muci-gray mt-0.5 italic">{{ $item->latestComment }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                                @endauth
+                            </div>{{-- fin flex items-start --}}
+
+                            {{-- Zona de imágenes (solo auth) --}}
                             @auth
-                            {{-- MODO EDICIÓN --}}
-                            <form method="POST" action="{{ route('items.update', $item) }}" class="flex-1 flex items-start gap-2">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="completed" value="0">
-                                <input type="checkbox" name="completed" value="1"
-                                       {{ $item->isCompleted ? 'checked' : '' }}
-                                       onchange="this.form.submit()"
-                                       class="mt-1 w-4 h-4 accent-muci-green cursor-pointer">
-                                <div class="flex-1">
-                                    <span class="text-sm {{ $item->isCompleted ? 'line-through text-muci-gray' : 'text-black' }}">
-                                        {{ $item->text }}
-                                    </span>
-                                    @if($item->latestComment)
-                                    <p class="text-xs text-muci-gray mt-0.5 italic">{{ $item->latestComment }}</p>
-                                    @endif
-                                </div>
-                            </form>
-                            @else
-                            {{-- MODO LECTURA --}}
-                            <div class="flex-1 flex items-start gap-2">
-                                <div class="mt-1 w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0
-                                    {{ $item->isCompleted ? 'bg-muci-green border-muci-green' : 'border-muci-gray-light' }}">
-                                    @if($item->isCompleted)
-                                    <svg class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                    </svg>
-                                    @endif
-                                </div>
-                                <div class="flex-1">
-                                    <span class="text-sm {{ $item->isCompleted ? 'line-through text-muci-gray' : 'text-black' }}">
-                                        {{ $item->text }}
-                                    </span>
-                                    @if($item->latestComment)
-                                    <p class="text-xs text-muci-gray mt-0.5 italic">{{ $item->latestComment }}</p>
-                                    @endif
+                            <div class="ml-8 mt-2">
+                                <div class="flex flex-wrap gap-2 items-center">
+                                    @foreach($item->images as $img)
+                                    <div class="relative group">
+                                        <img src="{{ \Storage::url($img->path) }}"
+                                             alt=""
+                                             class="w-20 h-20 object-cover rounded-lg border border-muci-gray-light cursor-pointer"
+                                             data-gallery-images="{{ e(json_encode($item->images->map(fn($i) => \Storage::url($i->path))->values()->all())) }}"
+                                             data-gallery-index="{{ $loop->index }}"
+                                             onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
+                                        <form method="POST" action="{{ route('images.destroy', [$item, $img]) }}"
+                                              class="absolute top-1 right-1"
+                                              onsubmit="return confirm('¿Eliminar imagen?')">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                    class="w-5 h-5 bg-white/90 rounded-full text-xs font-bold text-muci-gray hover:text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-sm">
+                                                ×
+                                            </button>
+                                        </form>
+                                    </div>
+                                    @endforeach
+
+                                    {{-- Botón agregar --}}
+                                    <form method="POST" action="{{ route('images.store', $item) }}"
+                                          enctype="multipart/form-data">
+                                        @csrf
+                                        <label class="w-20 h-20 flex items-center justify-center border-2 border-dashed border-muci-gray-light rounded-lg cursor-pointer hover:border-muci-green hover:bg-muci-green-pale/30 transition text-muci-gray hover:text-muci-green text-2xl leading-none select-none">
+                                            +
+                                            <input type="file" name="image" accept="image/*" class="hidden"
+                                                   onchange="this.closest('form').submit()">
+                                        </label>
+                                    </form>
                                 </div>
                             </div>
                             @endauth
-                        </div>
+                        </div>{{-- fin py-2.5 --}}
                         @endforeach
 
                         {{-- Agregar ítem (solo editora) --}}
