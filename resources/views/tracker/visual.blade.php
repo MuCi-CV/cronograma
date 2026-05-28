@@ -238,7 +238,7 @@
                     $firstImg = $bImages->first();
                 @endphp
                 @if($imageLayout === 'B' && $firstImg)
-                <div class="hidden md:flex w-[calc(50%-2.5rem)] items-stretch">
+                <div class="hidden md:flex w-[calc(50%-2.5rem)] max-w-[280px] items-stretch">
                     <img src="{{ \Storage::disk('public')->url($firstImg->path) }}"
                          alt=""
                          class="w-full h-full object-cover rounded-2xl cursor-pointer hover:opacity-95 transition"
