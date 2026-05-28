@@ -168,7 +168,7 @@
                                         <img src="{{ \Storage::disk('public')->url($img->path) }}"
                                              alt=""
                                              class="w-20 h-20 object-cover rounded-lg border border-muci-gray-light cursor-pointer"
-                                             data-gallery-images="{{ e(json_encode($item->images->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())) }}"
+                                             data-gallery-images="{{ json_encode($item->images->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all()) }}"
                                              data-gallery-index="{{ $loop->index }}"
                                              onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
                                         <form method="POST" action="{{ route('images.destroy', [$item, $img]) }}"

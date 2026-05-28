@@ -215,13 +215,13 @@
                         <img src="{{ \Storage::disk('public')->url($img->path) }}"
                              alt=""
                              class="w-12 h-12 object-cover rounded-lg cursor-pointer border border-muci-gray-light/50 hover:opacity-90 transition"
-                             data-gallery-images="{{ e(json_encode($sectionImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())) }}"
+                             data-gallery-images="{{ json_encode($sectionImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all()) }}"
                              data-gallery-index="{{ $imgIndex }}"
                              onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
                         @endforeach
                         @if($sectionImages->count() > 4)
                         <div class="w-12 h-12 rounded-lg bg-muci-green-pale flex items-center justify-center text-xs font-bold text-muci-green cursor-pointer"
-                             data-gallery-images="{{ e(json_encode($sectionImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())) }}"
+                             data-gallery-images="{{ json_encode($sectionImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all()) }}"
                              data-gallery-index="4"
                              onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
                             +{{ $sectionImages->count() - 4 }}
@@ -238,7 +238,7 @@
                     $firstImg = $bImages->first();
                 @endphp
                 @if($imageLayout === 'B' && $firstImg)
-                @php $galleryUrls = e(json_encode($bImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all())); @endphp
+                @php $galleryUrls = json_encode($bImages->map(fn($i) => \Storage::disk('public')->url($i->path))->values()->all()); @endphp
                 <div class="hidden md:grid grid-cols-2 gap-1 w-[calc(50%-2.5rem)] max-w-[280px] self-start">
                     @foreach($bImages as $bIdx => $bImg)
                     <img src="{{ \Storage::disk('public')->url($bImg->path) }}"
