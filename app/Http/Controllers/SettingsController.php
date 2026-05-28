@@ -15,7 +15,7 @@ class SettingsController extends Controller
         ]);
 
         foreach ($validated as $key => $value) {
-            Setting::set($key, (string) $value);
+            Setting::set($key, is_bool($value) ? ($value ? '1' : '0') : (string) $value);
         }
 
         return back();
