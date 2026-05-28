@@ -129,7 +129,7 @@
                 $state     = $isCurrent ? 'current' : ($isPast ? 'past' : 'future');
             @endphp
 
-            <div class="flex {{ $index % 2 === 0 ? 'flex-row' : 'flex-row-reverse' }} mb-10 relative md:flex flex-col md:flex-row pl-14 md:pl-0"
+            <div class="flex {{ $index % 2 === 0 ? 'flex-row' : 'flex-row-reverse' }} mb-10 relative flex-col md:flex-row pl-14 md:pl-0 md:justify-between md:items-stretch"
                  id="{{ $isCurrent ? 'tl-current' : '' }}">
 
                 {{-- Nodo desktop --}}
@@ -207,7 +207,47 @@
                         </div>
                     </details>
 
+                    {{-- Imágenes (Layout C + fallback móvil de B) --}}
+                    @php $sectionImages = $section->items->flatMap(fn($i) => $i->images->all()); @endphp
+                    @if($sectionImages->isNotEmpty())
+                    <div class="{{ $imageLayout === 'C' ? ($hideImagesMobile ? 'hidden md:flex' : 'flex') : ($hideImagesMobile ? 'hidden' : 'flex md:hidden') }} flex-wrap gap-1.5 mt-3 pt-3 border-t border-muci-green-pale/50">
+                        @foreach($sectionImages->take(4) as $imgIndex => $img)
+                        <img src="{{ \Storage::url($img->path) }}"
+                             alt=""
+                             class="w-12 h-12 object-cover rounded-lg cursor-pointer border border-muci-gray-light/50 hover:opacity-90 transition"
+                             data-gallery-images="{{ e(json_encode($sectionImages->map(fn($i) => \Storage::url($i->path))->values()->all())) }}"
+                             data-gallery-index="{{ $imgIndex }}"
+                             onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
+                        @endforeach
+                        @if($sectionImages->count() > 4)
+                        <div class="w-12 h-12 rounded-lg bg-muci-green-pale flex items-center justify-center text-xs font-bold text-muci-green cursor-pointer"
+                             data-gallery-images="{{ e(json_encode($sectionImages->map(fn($i) => \Storage::url($i->path))->values()->all())) }}"
+                             data-gallery-index="4"
+                             onclick="openGallery(JSON.parse(this.dataset.galleryImages), parseInt(this.dataset.galleryIndex))">
+                            +{{ $sectionImages->count() - 4 }}
+                        </div>
+                        @endif
+                    </div>
+                    @endif
+
                 </div>
+
+                {{-- Layout B: imagen opuesta (solo desktop) --}}
+                @php
+                    $bImages = $section->items->flatMap(fn($i) => $i->images->all());
+                    $firstImg = $bImages->first();
+                @endphp
+                @if($imageLayout === 'B' && $firstImg)
+                <div class="hidden md:flex w-[calc(50%-2.5rem)] items-stretch">
+                    <img src="{{ \Storage::url($firstImg->path) }}"
+                         alt=""
+                         class="w-full h-full object-cover rounded-2xl cursor-pointer hover:opacity-95 transition"
+                         style="max-height: 320px;"
+                         data-gallery-images="{{ e(json_encode($bImages->map(fn($i) => \Storage::url($i->path))->values()->all())) }}"
+                         data-gallery-index="0"
+                         onclick="openGallery(JSON.parse(this.dataset.galleryImages), 0)">
+                </div>
+                @endif
             </div>
             @endforeach
         </div>
