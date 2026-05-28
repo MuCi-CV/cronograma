@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImageController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TrackerController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/stages/{stage}/sections', [SectionController::class, 'store'])->name('sections.store');
     Route::post('/items/{item}/images', [ItemImageController::class, 'store'])->name('images.store');
     Route::delete('/items/{item}/images/{image}', [ItemImageController::class, 'destroy'])->name('images.destroy');
+    Route::patch('/tracker/settings', [SettingsController::class, 'update'])->name('tracker.settings.update');
 });
 
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
