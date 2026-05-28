@@ -79,5 +79,60 @@
     @yield('content')
 </main>
 
+{{-- Galería modal --}}
+<div id="gallery-overlay"
+     style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:center;justify-content:center;"
+     onclick="if(event.target===this)closeGallery()">
+    <button onclick="closeGallery()"
+            style="position:absolute;top:1rem;right:1.25rem;color:#fff;font-size:1.75rem;line-height:1;background:none;border:none;cursor:pointer;opacity:.8;">×</button>
+    <button id="gallery-prev"
+            style="position:absolute;left:1rem;color:#fff;font-size:2rem;background:none;border:none;cursor:pointer;padding:.5rem;opacity:.7;"
+            onclick="galleryNav(-1)">‹</button>
+    <img id="gallery-img"
+         style="max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;display:block;">
+    <button id="gallery-next"
+            style="position:absolute;right:1rem;color:#fff;font-size:2rem;background:none;border:none;cursor:pointer;padding:.5rem;opacity:.7;"
+            onclick="galleryNav(1)">›</button>
+    <div id="gallery-counter"
+         style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);color:#fff;font-size:.75rem;opacity:.7;"></div>
+</div>
+
+<script>
+(function() {
+    let _urls = [], _idx = 0;
+
+    window.openGallery = function(urls, index) {
+        _urls = urls;
+        _idx = index;
+        show();
+        document.getElementById('gallery-overlay').style.display = 'flex';
+        document.addEventListener('keydown', onKey);
+    };
+
+    window.closeGallery = function() {
+        document.getElementById('gallery-overlay').style.display = 'none';
+        document.removeEventListener('keydown', onKey);
+    };
+
+    window.galleryNav = function(dir) {
+        _idx = (_idx + dir + _urls.length) % _urls.length;
+        show();
+    };
+
+    function show() {
+        document.getElementById('gallery-img').src = _urls[_idx];
+        document.getElementById('gallery-counter').textContent = (_idx + 1) + ' / ' + _urls.length;
+        document.getElementById('gallery-prev').style.display = _urls.length > 1 ? 'block' : 'none';
+        document.getElementById('gallery-next').style.display = _urls.length > 1 ? 'block' : 'none';
+    }
+
+    function onKey(e) {
+        if (e.key === 'Escape') closeGallery();
+        if (e.key === 'ArrowLeft')  galleryNav(-1);
+        if (e.key === 'ArrowRight') galleryNav(1);
+    }
+})();
+</script>
+
 </body>
 </html>
